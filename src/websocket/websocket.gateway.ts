@@ -1,43 +1,31 @@
-import { RouterModule } from "@nestjs/core";
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { AppConstant, CanvasData, ChangeLanguagePayload, EditorDatasType, InputTextPayload, SearchPayload } from "shared-coding-gather";
+import { AppConstant, CanvasData, ChangeLanguagePayload, InputTextPayload, SearchPayload } from "shared-coding-gather";
 import { Server, Socket } from "socket.io";
-import { CanvasService } from "src/canvas/canvas.service";
-import { EditorService } from "src/editor/editor.service";
+import { WebsocketService } from "./websocket.service";
+import { UseInterceptors } from "@nestjs/common";
+import { WebsocketInterceptor } from "./websocket.interceptor";
+@UseInterceptors(WebsocketInterceptor)
 @WebSocketGateway(80, { namespace: "ws", cors: "localhost:5173"})
-export class WebsocketGateway{
-  constructor(
-    private readonly editorService: EditorService,
-    private readonly canvasService: CanvasService
-  ) {}
+export class WebsocketGateway {
+  constructor(private readonly websocketService: WebsocketService) {}
+
   @WebSocketServer()
   server: Server
   canvasData: CanvasData
 
-  @SubscribeMessage("inputText")
-  inputText(@ConnectedSocket() socket: Socket, @MessageBody() payload: InputTextPayload): void {
-    if(payload.direction === AppConstant.direction.TOP) {
-      this.editorService.editorData.topEditorData.setText(payload.text);
-    } else {
-      this.editorService.editorData.bottomEditorData.setText(payload.text);
-    }
-    socket.broadcast.emit("inputText", payload);
-    console.log(this.editorService.editorData.bottomEditorData.toString());
+  @SubscribeMessage(AppConstant.websocketEvent.INPUT_TEXT)
+  inputText(@MessageBody() payload: InputTextPayload): void {
+    this.websocketService.receiveInputTextEvent(payload);
+    this.websocketService.transmitInputTextEvent(payload);
   }
 
-  @SubscribeMessage("changeLanguage")
-  changeLanguage(@ConnectedSocket() socket: Socket, @MessageBody() payload: ChangeLanguagePayload): void {
-    if(payload.direction === AppConstant.direction.TOP) {
-      this.editorService.editorData.topEditorData.setLanguage(payload.language);
-    } else {
-      this.editorService.editorData.bottomEditorData.setLanguage(payload.language);
-    }
-    socket.broadcast.emit("changeLanguage", payload);
+  @SubscribeMessage(AppConstant.websocketEvent.CHANGE_LANGUAGE)
+  changeLanguage(@MessageBody() payload: ChangeLanguagePayload): void {
+    this.websocketService.receiveChangeLanguageEvent(payload);
+    this.websocketService.transmitChangeLanguageEvent(payload);
   }
 
-  @SubscribeMessage("search")
+  @SubscribeMessage(AppConstant.websocketEvent.SEARCH)
   search(@ConnectedSocket() socket: Socket, @MessageBody() payload: SearchPayload): void {
-    this.canvasService.setUrl(payload.url);
-    console.log(this.canvasService.toString());
   }
 }
