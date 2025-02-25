@@ -5,11 +5,11 @@ import { CanvasData, ToolsType } from "shared-coding-gather";
 export class CanvasService {
   canvas: CanvasData = new CanvasData();
 
-  getBinary(): number[] {
+  getBinary(): Uint8Array {
     return this.canvas.getBinary()
   }
 
-  setBinary(binary: number[]): void {
+  setBinary(binary: Uint8Array): void {
     this.canvas.setBinary(binary)
   }
 
@@ -27,6 +27,14 @@ export class CanvasService {
 
   setTool(tool: ToolsType): ToolsType {
     return this.canvas.setTool(tool)
+  }
+
+  isPending(): boolean {
+    return this.canvas.isPending()
+  }
+
+  setPending(pending: boolean): void {
+    this.canvas.setPending(pending)
   }
 
   toString(): string {
