@@ -26,6 +26,12 @@ export class WebsocketGateway {
   }
 
   @SubscribeMessage(AppConstant.websocketEvent.SEARCH)
-  search(@ConnectedSocket() socket: Socket, @MessageBody() payload: SearchPayload): void {
+  search(@MessageBody() payload: SearchPayload): void {
+    try {
+      this.websocketService.receiveSearchEvent(payload);
+      this.websocketService.transmitSearchEvent().ok();
+    } catch (error) {
+      this.websocketService.transmitSearchEvent().fail();
+    }
   }
 }
