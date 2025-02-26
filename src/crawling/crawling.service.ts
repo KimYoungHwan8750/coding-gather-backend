@@ -35,7 +35,7 @@ export class CrawlingService implements OnModuleInit, OnApplicationShutdown{
     } catch (err) {
       throw new Error("스크린샷을 찍을 수 없습니다.");
     }
-    return await this.page.screenshot({path: "screenshot.png", fullPage: true, type: "png"});
+    return await this.page.screenshot({fullPage: true});
   }
 
 }
