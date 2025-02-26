@@ -12,9 +12,7 @@ export class WebsocketService {
   constructor(
     private readonly editorService: EditorService,
     private readonly canvasService: CanvasService,
-    private readonly crawlingService: CrawlingService
   ) {}
-
 
   setSocket(socket: Socket) {
     this.socket = socket;
@@ -43,29 +41,17 @@ export class WebsocketService {
       direction: payload.direction,
       language: this.editorService.getLanguage(payload.direction),
     }
+    this.socket.broadcast.emit(AppConstant.websocketEvent.CHANGE_LANGUAGE, data);
     this.socket.emit(AppConstant.websocketEvent.CHANGE_LANGUAGE, data);
   }
 
   async receiveSearchEvent(payload: SearchPayload) {
-    const binary = await this.crawlingService.getScreenshot(payload.url);
     this.canvasService.setUrl(payload.url);
-    this.canvasService.setBinary(binary);
+    this.canvasService.setPending(true);
   }
 
   transmitSearchEvent() {
-    let data: SearchResponse;
-    const emit = () => this.socket.emit(AppConstant.websocketEvent.SEARCH, data);
-    const ok = () => {
-      data.code = 200;
-      data.binary = this.canvasService.getBinary();
-      emit();
-    }
-    const fail = () => {
-      data.code = 404;
-      data.binary = null;
-      emit();
-    }
-    return { ok, fail }
+    this.socket.emit(AppConstant.websocketEvent.SEARCH, { pending: this.canvasService.isPending() });
   }
 
 }

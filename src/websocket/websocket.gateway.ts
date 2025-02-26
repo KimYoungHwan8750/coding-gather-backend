@@ -11,7 +11,6 @@ export class WebsocketGateway {
 
   @WebSocketServer()
   server: Server
-  canvasData: CanvasData
 
   @SubscribeMessage(AppConstant.websocketEvent.INPUT_TEXT)
   inputText(@MessageBody() payload: InputTextPayload): void {
@@ -27,11 +26,7 @@ export class WebsocketGateway {
 
   @SubscribeMessage(AppConstant.websocketEvent.SEARCH)
   search(@MessageBody() payload: SearchPayload): void {
-    try {
-      this.websocketService.receiveSearchEvent(payload);
-      this.websocketService.transmitSearchEvent().ok();
-    } catch (error) {
-      this.websocketService.transmitSearchEvent().fail();
-    }
+    this.websocketService.receiveSearchEvent(payload);
+    this.websocketService.transmitSearchEvent();
   }
 }
