@@ -1,30 +1,30 @@
 import { Injectable } from "@nestjs/common";
-import { AppConstant, DirectionType, EditorData, EditorDatas, EditorDatasType, LanguageType } from "shared-coding-gather";
+import { AppConstant, DirectionType, EditorController, EditorControllers, LanguageType } from "shared-coding-gather";
 
 @Injectable()
 export class EditorService {
-  private readonly editorData: EditorDatasType = new EditorDatas();
+  private readonly editorControllers: EditorControllers = new EditorControllers();
 
   /**
-   * @returns type EditorData: 위 EditorData를 반환합니다.
+   * @returns type EditorController: 위 EditorController를 반환합니다.
    */
-  getTopEditorData(): EditorData {
-    return this.editorData.topEditorData;
+  getTopEditorData(): EditorController {
+    return this.editorControllers.topEditorController;
   }
   /**
-   * @returns type EditorData: 아래 EditorData를 반환합니다.
+   * @returns type EditorController: 아래 EditorController를 반환합니다.
    */
-  getBottomEditorData(): EditorData {
-    return this.editorData.bottomEditorData;
+  getBottomEditorData(): EditorController {
+    return this.editorControllers.bottomEditorController;
   }
 
   /**
    * @param direction Appconstant.direction.TOP | Appconstant.direction.BOTTOM
    * @returns type EditorData
-   * @description direction을 전달하면 해당 방향의 EditorData를 반환합니다.
+   * @description direction을 전달하면 해당 방향의 EditorController를 반환합니다.
    */
   getText(direction: DirectionType) {
-    return direction === AppConstant.direction.TOP ? this.editorData.topEditorData.getText() : this.editorData.bottomEditorData.getText();
+    return direction === AppConstant.direction.TOP ? this.editorControllers.topEditorController.getText() : this.editorControllers.bottomEditorController.getText();
   }
 
   /**
@@ -33,7 +33,7 @@ export class EditorService {
    * @description direction을 전달하면 해당 방향의 EditorData의 Language를 반환합니다.
    */
   getLanguage(direction: DirectionType) {
-    return direction === AppConstant.direction.TOP ? this.editorData.topEditorData.getLanguage() : this.editorData.bottomEditorData.getLanguage();
+    return direction === AppConstant.direction.TOP ? this.editorControllers.topEditorController.getLanguage() : this.editorControllers.bottomEditorController.getLanguage();
   }
 
   /**
@@ -43,9 +43,9 @@ export class EditorService {
    */
   setText(direction: DirectionType, text: string) {
     if(direction === AppConstant.direction.TOP) {
-      this.editorData.topEditorData.setText(text);
+      this.editorControllers.topEditorController.setText(text);
     } else {
-      this.editorData.bottomEditorData.setText(text);
+      this.editorControllers.bottomEditorController.setText(text);
     }
   }
 
@@ -55,9 +55,9 @@ export class EditorService {
    */
   setLanguage(direction: DirectionType, language: LanguageType) {
     if(direction === AppConstant.direction.TOP) {
-      this.editorData.topEditorData.setLanguage(language);
+      this.editorControllers.topEditorController.setLanguage(language);
     } else {
-      this.editorData.bottomEditorData.setLanguage(language);
+      this.editorControllers.bottomEditorController.setLanguage(language);
     }
   }
   

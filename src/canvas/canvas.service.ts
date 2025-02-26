@@ -1,43 +1,35 @@
 import { Injectable } from "@nestjs/common";
-import { CanvasData, ToolsType } from "shared-coding-gather";
+import { CanvasController, CanvasData, ToolsType } from "shared-coding-gather";
 
 @Injectable()
 export class CanvasService {
-  canvas: CanvasData = new CanvasData();
-
-  getBinary(): Uint8Array {
-    return this.canvas.getBinary()
-  }
-
-  setBinary(binary: Uint8Array): void {
-    this.canvas.setBinary(binary)
-  }
+  canvasController: CanvasController = new CanvasController();
 
   getUrl(): string {
-    return this.canvas.getUrl()
+    return this.canvasController.getUrl()
   }
 
   setUrl(url: string): void {
-    this.canvas.setUrl(url)
+    this.canvasController.setUrl(url)
   }
 
   getTool(): ToolsType {
-    return this.canvas.getTool()
+    return this.canvasController.getTool()
   }
 
   setTool(tool: ToolsType): ToolsType {
-    return this.canvas.setTool(tool)
+    return this.canvasController.setTool(tool)
   }
 
   isPending(): boolean {
-    return this.canvas.isPending()
+    return this.canvasController.isPending()
   }
 
   setPending(pending: boolean): void {
-    this.canvas.setPending(pending)
+    this.canvasController.setPending(pending)
   }
 
   toString(): string {
-    return this.canvas.toString()
+    return this.canvasController.toString()
   }
 }
