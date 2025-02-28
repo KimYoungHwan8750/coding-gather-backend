@@ -1,9 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { AppConstant, ChangeLanguagePayload, ChangeLanguageResponse, InputTextPayload, InputTextResponse, SearchPayload, SearchResponse } from "shared-coding-gather";
+import { AppConstant, CanvasData, ChangeLanguagePayload, ChangeLanguageResponse, EditorData, FirstJoinResponse, InputTextPayload, InputTextResponse, Mutable, SearchPayload, SearchResponse } from "shared-coding-gather";
 import { CanvasService } from "src/canvas/canvas.service";
 import { EditorService } from "src/editor/editor.service";
 import { Socket } from "socket.io";
-import { CrawlingService } from "src/crawling/crawling.service";
 
 @Injectable()
 export class WebsocketService {
@@ -18,8 +17,7 @@ export class WebsocketService {
     this.socket = socket;
   }
   receiveInputTextEvent(payload: InputTextPayload) {
-    const editor = payload.direction === AppConstant.direction.TOP ? this.editorService.getTopEditorData() : this.editorService.getBottomEditorData();
-    editor.setText(payload.text);
+    payload.direction === AppConstant.direction.TOP ? this.editorService.getTopEditorController().setText(payload.text) : this.editorService.getBottomEditorController().setText(payload.text);
   }
 
   transmitInputTextEvent(payload: InputTextPayload) {
@@ -32,8 +30,7 @@ export class WebsocketService {
   }
 
   receiveChangeLanguageEvent(payload: ChangeLanguagePayload) {
-    const editor = payload.direction === AppConstant.direction.TOP ? this.editorService.getTopEditorData() : this.editorService.getBottomEditorData();
-    editor.setLanguage(payload.language);
+    payload.direction === AppConstant.direction.TOP ? this.editorService.getTopEditorController().setLanguage(payload.language) : this.editorService.getBottomEditorController().setLanguage(payload.language);
   }
 
   transmitChangeLanguageEvent(payload: ChangeLanguagePayload) {
@@ -54,4 +51,27 @@ export class WebsocketService {
     this.socket.emit(AppConstant.websocketEvent.SEARCH, { pending: this.canvasService.isPending() });
   }
 
+  transmitFirstJoinEvent() {
+    const topEditorData: EditorData = {
+      direction: AppConstant.direction.TOP,
+      text: this.editorService.getTopEditorController().getText(),
+      language: this.editorService.getTopEditorController().getLanguage()
+    }
+    const bottomEditorData: EditorData = {
+      direction: AppConstant.direction.BOTTOM,
+      text: this.editorService.getBottomEditorController().getText(),
+      language: this.editorService.getBottomEditorController().getLanguage()
+    }
+    const canvasData: CanvasData = {
+      url: this.canvasService.getUrl(),
+      tool: this.canvasService.getTool(),
+      pending: this.canvasService.isPending()
+    }
+    const data: FirstJoinResponse = {
+      topEditorData,
+      bottomEditorData,
+      canvasData
+    }
+    this.socket.emit(AppConstant.websocketEvent.FIRST_JOIN, data);
+  }
 }

@@ -1,12 +1,12 @@
-import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { AppConstant, CanvasData, ChangeLanguagePayload, InputTextPayload, SearchPayload } from "shared-coding-gather";
+import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import { AppConstant, CanvasData, ChangeLanguagePayload, EditorController, FirstJoinResponse, InputTextPayload, SearchPayload } from "shared-coding-gather";
 import { Server, Socket } from "socket.io";
 import { WebsocketService } from "./websocket.service";
 import { UseInterceptors } from "@nestjs/common";
 import { WebsocketInterceptor } from "./websocket.interceptor";
 @UseInterceptors(WebsocketInterceptor)
 @WebSocketGateway(80, { namespace: "ws", cors: "localhost:5173"})
-export class WebsocketGateway {
+export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly websocketService: WebsocketService) {}
 
   @WebSocketServer()
@@ -28,5 +28,13 @@ export class WebsocketGateway {
   search(@MessageBody() payload: SearchPayload): void {
     this.websocketService.receiveSearchEvent(payload);
     this.websocketService.transmitSearchEvent();
+  }
+
+  handleConnection(@ConnectedSocket() client: Socket) {
+    this.websocketService.setSocket(client);
+    this.websocketService.transmitFirstJoinEvent();
+  }
+
+  handleDisconnect(client: Socket) {
   }
 }
