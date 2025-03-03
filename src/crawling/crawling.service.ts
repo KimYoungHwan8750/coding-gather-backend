@@ -27,15 +27,16 @@ export class CrawlingService implements OnModuleInit, OnApplicationShutdown{
      * 이렇게 하면 현재는 본문만 남는 정상적인 동작이지만
      * 사이트 구조가 바뀌면 제대로 동작하지 않을 수 있습니다.
      */
-      await this.page.evaluate(() => {
-        const row = document.querySelector("div[class='row']");
-        document.body.innerHTML = "";
-        document.body.appendChild(row);
-      })
+      if(url.includes("acmicpc")) {
+        await this.page.evaluate(() => {
+          const row = document.querySelector("div[class='row']");
+          document.body.innerHTML = "";
+          document.body.appendChild(row);
+        })
+      }
     } catch (err) {
       throw new Error("스크린샷을 찍을 수 없습니다.");
     }
     return await this.page.screenshot({fullPage: true});
   }
-
 }
